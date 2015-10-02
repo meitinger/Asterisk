@@ -1,0 +1,8 @@
+sudo chmod 2750 /etc/asterisk/ &&
+sudo chown sysadmin:root /etc/asterisk/ &&
+sudo cp config/* /etc/asterisk/ &&
+sudo tar --directory=/ -xf audio.tar.gz &&
+sudo cp 01_exim4-config_aufbauwerk /etc/exim4/conf.d/rewrite/ &&
+sudo cp logrotate/asterisk /etc/logrotate.d/ &&
+sudo install init/asterisk /etc/init.d/asterisk &&
+sudo update-rc.d asterisk defaults
