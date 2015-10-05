@@ -1,0 +1,80 @@
+Vereinfachte Wählplanbeschreibung:
+==================================
+
+
+Während eines Gespräches:
+~~~~~~~~~~~~~~~~~~~~~~~~~
+##        leitet ein Gespräch ohne Rückfragen weiter
+          (muss bei einkommenden Faxen verwendet werden)
+          (nicht geeignet für Weiterleitung an Anschlüsse ohne Mailbox)
+          (erfordert PRIVILEGE_TRANSFERCALL)
+**        leitet ein Gespräch mit Rückfragen weiter
+          (darf nicht bei einkommenden Faxen verwendet werden)
+          (erfordert PRIVILEGE_TRANSFERCALL)
+
+
+Von außerhalb des Firmennetzwerkes:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+01        fragt die Voicemail ab, wobei zuerst nach der Mailboxnummer und dann
+          nach dem Passwort gefragt wird
+
+
+Von einem Telefon:
+~~~~~~~~~~~~~~~~~~
+1         fragt die Voicemail ab und erlaubt die Aufzeichnung von Texten unter
+          der Option '0' im Voicemailmenü (siehe unten)
+*1*nn     erlaubt das Abrufen des Voicemailmenüs eines beliebigen Anschlusses
+          (erfordert PRIVILEGE_SKIPPASSCODE)
+--------------------------------------------------------------------------------
+0         ruft das aktuelle Programm auf, so als würde man von außerhalb anrufen
+nn        ruft den Anschluss nn im selben Standort an
+snn       ruft den Anschluss nn am Standort s an, wobei s folgende Werte hat:
+            2 - Bad Häring
+            4 - Innsbruck
+            5 - Nikolsdorf
+            6 - Telfs
+            8 - Volders
+          (erfordert PRIVILEGE_REMOTECALL)
+s00       ruft das aktuelle Programm am Standort s an (wie von außerhalb)
+          (erfordert PRIVILEGE_REMOTECALL)
+s01       ruft das Voicemailmenü am Standort s auf (wie von außerhalb)
+          (erfordert PRIVILEGE_REMOTECALL)
+0.......  ruft die Rufnummer über ISDN oder T-Mobile an
+          (erfordert PRIVILEGE_EXTERNALCALL)
+--------------------------------------------------------------------------------
+*11       fragt das gesetzte Standortprogramm ab
+*12*q     legt das Standortprogramm fest, wobei q eine Nummer von 1 bis 9 ist
+          und vorher von der Systemadministration konfiguriert werden muss
+          (erfordert PRIVILEGE_SETPROGRAM)
+*13       schaltet das Standortprogramm aus und geht damit sofort bei externen
+          Anrufen auf Voicemail, z.B. für Betriebsurlaub
+          (erfordert PRIVILEGE_SETPROGRAM)
+--------------------------------------------------------------------------------
+*22       fragt den Anschluss ab dessen Voicemail als Standortvoicemailbox dient
+*23*nn    legt die Mailbox des Anschlusses nn als Standortvoicemailbox fest
+          (erfordert PRIVILEGE_SETMAILBOX)
+*24       deaktiviert die Standortvoicemailbox (sollte nie verwendet werden
+          (erfordert PRIVILEGE_SETMAILBOX)
+
+
+Voicemail-Texte (Option '0'):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Text für Nicht-Erreichbar (Unteroption '1'):
+  Im Modul xy ist leider zurzeit niemand erreichbar.
+  Drücken Sie 0 um mit der Vermittlung verbunden zu werden oder
+  hinterlassen Sie eine Nachricht nach dem Signalton.
+  [PAUSE von 3-4 Sekunden]
+Text für Telefoniert-Gerade (Unteroption '2'):
+  Im Modul xy sind momentan alle Coaches beschäftigt und können Ihren Anruf leider nicht entgegen nehmen.
+  Sie können es zu einem späteren Zeitpunkt nochmals versuchen oder
+  die 0 drücken um stattdessen mit der Vermittlung verbunden zu werden oder
+  nach dem Signalton eine Nachricht hinterlassen.
+  [PAUSE von 3-4 Sekunden]
+Text für Namen (Unteroption '3'):
+  Module xy
+Text für Urlaub (Unteroption '4'):
+   Das Modul xy ist bis einschließlich ... geschlossen.
+   Sie können uns ab diesem Zeitpunkt wieder erreichen oder
+   nach dem Signalton eine Nachricht hinterlassen.
+   Danke und auf Wiederhören.
+   [PAUSE von 1-2 Sekunden]
