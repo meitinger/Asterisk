@@ -1,0 +1,14 @@
+fax_check_mail:
+  deny
+    hosts = ! +relay_from_hosts
+    message = Sorry, I am not allowed to fax anything from you.
+  accept
+
+fax_check_rcpt:
+  deny
+    domains = ! +relay_to_domains
+    message = Sorry, only faxing is allowed.
+  deny
+    local_parts = ! \N^0\d+$\N
+    message = Sorry, the provided fax number is invalid.
+  accept

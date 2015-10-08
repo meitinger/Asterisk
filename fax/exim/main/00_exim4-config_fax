@@ -1,0 +1,2 @@
+MAIN_ACL_CHECK_MAIL = fax_check_mail
+MAIN_ACL_CHECK_RCPT = fax_check_rcpt
