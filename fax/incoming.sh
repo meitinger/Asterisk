@@ -23,8 +23,8 @@ EOF
 
 [ $# -eq 1 ] || die "USAGE: $0 recipient"
 
-run  "convert sff to tif" 'sfftobmp -tif "${ROOT}.sff" -o "${TEMP}/${MESSAGE_ID}.tif"'
+run "convert sff to tif" 'sfftobmp -tif "${ROOT}.sff" -o "${TEMP}/${MESSAGE_ID}.tif"'
 send "${TEMP}/${MESSAGE_ID}.tif" "$1"
-run  "remove sff file"    'rm -f "${ROOT}.sff"'
+run "remove sff file" 'rm -f "${ROOT}.sff"'
 
 finish

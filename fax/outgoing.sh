@@ -92,13 +92,13 @@ if [ $# -eq 0 ]; then
 	[ ${TIFS_COUNT} -eq 1 ] || die "The e-mail contains more than one tif."
 	run "copy tif file"       'cp -f -T "${TIFS}" "${ROOT}.tif"'
 	run "create ps file"      'tiff2ps -h 11.69 -w 8.27 -O "${TEMP}/ps" "${ROOT}.tif"'
-	run "create sff file"     'gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=cfax   -sOutputFile="${ROOT}.sff" "${TEMP}/ps"'
+	run "create sff file"     'gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=cfax -sOutputFile="${ROOT}.sff" "${TEMP}/ps"'
 	run "store sender"        'echo "${SENDER}" > "${ROOT}.sender"'
 	run "create call file"    'echo "${CALLFILE}" > "${TEMP}/call"'
 	run "move call file"      'mv -f -T "${TEMP}/call" "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call"'
 else
-	run "restore sender" 'SENDER=$(cat "${ROOT}.sender")'
-	run "count retries"  'RETRIES=$(grep -c "^StartRetry:" "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call")'
+	run "restore sender"      'SENDER=$(cat "${ROOT}.sender")'
+	run "count retries"       'RETRIES=$(grep -c "^StartRetry:" "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call")'
 
 	# check if this is the last try
 	if [ ${RETRIES} -le ${MAXRETRIES} ]; then
