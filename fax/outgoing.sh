@@ -98,14 +98,14 @@ if [ $# -eq 0 ]; then
 	run "move call file"      'mv -f -T "${TEMP}/call" "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call"'
 else
 	run "restore sender" 'SENDER=$(cat "${ROOT}.sender")'
-	run "count retries"  'RETRIES=$(grep -c '\''^RETRY$'\'' "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call")'
+	run "count retries"  'RETRIES=$(grep -c "^StartRetry:" "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call")'
 
 	# check if this is the last try
-	if [ ${RETRIES} -lt ${MAXRETRIES} ]; then
+	if [ ${RETRIES} -le ${MAXRETRIES} ]; then
 		FAILURE_FOOTER=${FAILURE_FOOTER_RETRY}
 		CLEANUP=0
 	else
-		FAILURE_FOOTER=${FAILER_FOOTER_LAST}
+		FAILURE_FOOTER=${FAILURE_FOOTER_LAST}
 		CLEANUP=1
 	fi
 
