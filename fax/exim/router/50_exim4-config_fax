@@ -1,7 +1,6 @@
 fax:
   debug_print = "R: fax for $local_part@$domain"
   driver = accept
-  hosts = +relay_from_hosts
   domains = +relay_to_domains
   local_parts = \N^0\d+$\N
   transport = spool_fax

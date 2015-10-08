@@ -12,7 +12,7 @@ Sie haben ein ${PAGES}-seitiges Fax von der Gegenstelle ${STATIONID} erhalten.
 
 Das Fax befindet sich im Anhang.
 
-Mit freundlichen GrÃ¼ÃŸen,
+Mit freundlichen Grüßen,
 Ihre Telefonanlage
 EOF
 )
@@ -23,10 +23,8 @@ EOF
 
 [ $# -eq 1 ] || die "USAGE: $0 recipient"
 
-do "write success message" 'echo "${MESSAGE}" > "${ROOT}.txt"'
-do "convert sff to tif"    'sfftobmp -tif "${ROOT}.sff" -o "${ROOT}.tif"'
-do "create mime file"      'mpack -s "${SUBJECT}" -d "${ROOT}.txt" -c image/tiff -o "${ROOT}.mime" "${ROOT}.tif"'
-do "send mail to $1"       'sendmail -i -f "${SERVERMAIL}" -F "${FROMSTRING}" "$1" < "${ROOT}/mime"'
-do "cleanup files"         'rm -f "${ROOT}.sff" "${ROOT}.txt" "${ROOT}.tif" "${ROOT}.mime"'
+run  "convert sff to tif" 'sfftobmp -tif "${ROOT}.sff" -o "${TEMP}/${MESSAGE_ID}.tif"'
+send "${TEMP}/${MESSAGE_ID}.tif" "$1"
+run  "remove sff file"    'rm -f "${ROOT}.sff"'
 
-exit 0
+finish

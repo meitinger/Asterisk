@@ -38,5 +38,19 @@ sudo make install &&
 cd ..
 
 # Fax
-apt-get install mpack libtiff-tools ghostscript sfftobmp &&
-...
+sudo apt-get install mpack libtiff-tools ghostscript sfftobmp &&
+sudo mkdir -p /var/spool/asterisk/outgoing &&
+sudo chown root:Debian-exim /var/spool/asterisk/outgoing &&
+sudo chmod g+w /var/spool/asterisk/outgoing &&
+sudo mkdir -p /var/spool/asterisk/fax &&
+sudo chown root:Debian-exim /var/spool/asterisk/fax &&
+sudo chmod g+w /var/spool/asterisk/fax &&
+sudo install fax/outgoing.sh /var/spool/asterisk/fax/ &&
+sudo install fax/incoming.sh /var/spool/asterisk/fax/ &&
+sudo cp fax/common.sh /var/spool/asterisk/fax/ &&
+sudo touch /var/log/asterisk/fax_log &&
+sudo chown Debian-exim:adm /var/log/asterisk/fax_log &&
+sudo cp fax/extensions_fax.conf /etc/asterisk/ &&
+sudo cp fax/modules_fax.conf /etc/asterisk/ &&
+sudo cp -R fax/exim/* /etc/exim4/conf.d/ &&
+sudo dpkg-reconfigure exim4-config

@@ -4,22 +4,22 @@
 # the GNU General Public License Version 2. See the LICENSE file
 # at the top of the source tree.
 
-CHANNEL="CAPI/g0/33:${LOCAL_PART}/Bo"
-CALLERID='"Bad Haering" <+4353329330033>'
+CHANNEL="CAPI/g0/53:${LOCAL_PART}/Bo"
+CALLERID='"AufBauWerk" <+4351258581453>'
 TIMEOUT=600
-WAITIME=30
+WAITTIME=30
 MAXRETRIES=2
 RETRYTIME=180
 
-SUCCESS_SUBJECT="[fax] SendebestÃ¤tigung"
+SUCCESS_SUBJECT="[fax] Sendebestätigung"
 SUCCESS_MESSAGE=$(cat << EOF
 Dies ist eine automatisch generierte Nachricht.
 
-Ihr Fax an ${LOCAL_PART} wurde erfolgreich an Gegenstelle ${STATIONID} Ã¼bermittelt.
+Ihr Fax an ${LOCAL_PART} wurde erfolgreich an Gegenstelle ${STATIONID} übermittelt.
 
 Eine Kopie des Faxes befindet sich im Anhang.
 
-Mit freundlichen GrÃ¼ÃŸen,
+Mit freundlichen Grüßen,
 Ihre Telefonanlage
 EOF
 )
@@ -29,30 +29,34 @@ FAILURE_HEADER=$(cat << EOF
 Dies ist eine automatisch generierte Nachricht.
 
 Beim Sendeversuch an Faxnummer ${LOCAL_PART} trat folgender Fehler auf:
+
+> 
 EOF
 )
-FAILURE_MESSAGE_TIMEOUT="Die maximale Sendedauer von ${TIMEOUT} Sekunden wurde Ã¼berschritten."
-FAILURE_MESSAGE_TRANSMISSION="Bei der Ãœbermittlung trat ein Fehler auf."
-FAILURE_MESSAGE_BUSY="Bei der gewÃ¤hlten Nummer ist zur Zeit besetzt."
-FAULURE_MESSAGE_HANGUP="Die Gegenstelle hat aufgelegt."
-FAILURE_MESSAGE_NOANSWER="Die Gegenstelle hat nach ${WAITIME} Sekunden Klingeln nicht geantwortet."
+FAILURE_MESSAGE_TIMEOUT="Die maximale Sendedauer von ${TIMEOUT} Sekunden wurde überschritten."
+FAILURE_MESSAGE_TRANSMISSION="Bei der Übermittlung trat ein Fehler auf."
+FAILURE_MESSAGE_BUSY="Bei der gewählten Nummer ist derzeit besetzt."
+FAILURE_MESSAGE_HANGUP="Die Gegenstelle hat aufgelegt."
+FAILURE_MESSAGE_NOANSWER="Die Gegenstelle hat nach ${WAITTIME} Sekunden Klingeln nicht geantwortet."
 FAILURE_MESSAGE_CONGESTION="Die ausgehende Leitung ist belegt."
 FAILURE_MESSAGE_UNKNOWN="Ein unbekannter Fehler ist aufgetreten. ($1)"
-FAILURE_FOOTER=$(cat << EOF
+FAILURE_FOOTER_RETRY=$(cat << EOF
+
 
 In ${RETRYTIME} Sekunden wird ein weiterer Zustellversuch gestartet.
 
-Mit freundlichen GrÃ¼ÃŸen,
+Mit freundlichen Grüßen,
 Ihre Telefonanlage
 EOF
 )
 FAILURE_FOOTER_LAST=$(cat << EOF
 
+
 Dies war der letzte Zustellversuch.
 
-Bitte kontrollieren Sie die Nummer und senden Sie das Fax spÃ¤ter erneut. Eine Kopie befindet sich im Anhang.
+Bitte kontrollieren Sie die Nummer und senden Sie das Fax später erneut. Eine Kopie befindet sich im Anhang.
 
-Mit freundlichen GrÃ¼ÃŸen,
+Mit freundlichen Grüßen,
 Ihre Telefonanlage
 EOF
 )
@@ -79,41 +83,73 @@ EOF
 )
 
 if [ $# -eq 0 ]; then
-	do "save mail to file"   'cat - > "${ROOT}.mime"'
-	do "create unpack dir"   'UNPACK=$(mktmp -d)'
-	do "extract attachments" 'munpack -f -q -C "${UNPACK}" "${ROOT}.mime"'
-	do "find tif files"      'TIFS=$(find "${UNPACK}" -wholename "*.tif" -type f)'
-	do "count tif files"     'TIFS_COUNT=$(echo "$TIFS" | wc -l)'
-	[ ${TIFS_COUNT} -eq 1 ] && do "copy tif file" 'cp -f -T "${TIFS}" "${ROOT}.tif"'
-	rm -r -f "${UNPACK}" 
-	[ ${TIFS_COUNT} -eq 0 ] && die "The e-mail doesn't contain any tifs."
-	[ ${TIFS_COUNT} -gt 1 ] && die "The e-mail contains more than one tif."
-	do "create ps file"      'gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=psgray -sOutputFile=- "${ROOT}.tif" | perl -n -e '\''if(/^([0-9]+) ([0-9]+) (null|\/(a[0-4]|letter|legal|tabloid|ledger|archE)) setpagesize$/){print(($1>$2?"842 595":"595 842")." null setpagesize\n<</Orientation ".($1>$2?3:0).">> setpagedevice\n");}else{print();}'\'' > "${ROOT}.ps"' 
-	do "create sff file"     'gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=cfax   -sOutputFile="${ROOT}.sff" "${ROOT}.ps"' "create sff file"
-	do "store sender"        'echo "${SENDER}" > "{ROOT}.sender"'
-	do "create call file"    'echo "${CALLFILE} > "${ROOT}.call"'
-	do "move call file"      'mv -f -T "${ROOT}.call" "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call"'
-elif
-	do "count retries" 'RETRIES=$(grep '\''^RETRY$'\'' "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call" | wc -l)'
-	
+	run "save mail to file"   'cat - > "${TEMP}/mime"'
+	run "create unpack dir"   'mkdir "${TEMP}/unpack/"'
+	run "extract attachments" 'munpack -f -q -C "${TEMP}/unpack/" "${TEMP}/mime"'
+	run "find tif files"      'TIFS=$(find "${TEMP}/unpack/" -wholename "*.tif?" -type f)'
+	[ -n "${TIFS}" ] || die "The e-mail doesn't contain any tifs."
+	run "count tif files"     'TIFS_COUNT=$(echo "${TIFS}" | wc -l)'
+	[ ${TIFS_COUNT} -eq 1 ] || die "The e-mail contains more than one tif."
+	run "copy tif file"       'cp -f -T "${TIFS}" "${ROOT}.tif"'
+	run "create ps file"      'tiff2ps -h 11.69 -w 8.27 -O "${TEMP}/ps" "${ROOT}.tif"'
+	run "create sff file"     'gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=cfax   -sOutputFile="${ROOT}.sff" "${TEMP}/ps"'
+	run "store sender"        'echo "${SENDER}" > "${ROOT}.sender"'
+	run "create call file"    'echo "${CALLFILE}" > "${TEMP}/call"'
+	run "move call file"      'mv -f -T "${TEMP}/call" "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call"'
+else
+	run "restore sender" 'SENDER=$(cat "${ROOT}.sender")'
+	run "count retries"  'RETRIES=$(grep -c '\''^RETRY$'\'' "/var/spool/asterisk/outgoing/${MESSAGE_ID}.call")'
+
+	# check if this is the last try
+	if [ ${RETRIES} -lt ${MAXRETRIES} ]; then
+		FAILURE_FOOTER=${FAILURE_FOOTER_RETRY}
+		CLEANUP=0
+	else
+		FAILURE_FOOTER=${FAILER_FOOTER_LAST}
+		CLEANUP=1
+	fi
+
+	# handle the different results
 	case "$1" in
 		-s)
 			SUBJECT=${SUCCESS_SUBJECT}
 			MESSAGE=${SUCCESS_MESSAGE}
+			CLEANUP=1
 			;;
 		-x)
-			SUBJECT="${FAILURE}"
+			SUBJECT=${FAILURE_SUBJECT}
+			MESSAGE=${FAILURE_HEADER}${FAILURE_MESSAGE_TRANSMISSION}${FAILURE_FOOTER_LAST}
+			CLEANUP=1
 			;;
 		-t)
-			SUBJECT="${SUBJECT_FAILURE}"
+			SUBJECT=${FAILURE_SUBJECT}
+			MESSAGE=${FAILURE_HEADER}${FAILURE_MESSAGE_TIMEOUT}${FAILURE_FOOTER_LAST}
+			CLEANUP=1
 			;;
 		-1)
+			SUBJECT=${FAILURE_SUBJECT}
+			MESSAGE=${FAILURE_HEADER}${FAILURE_MESSAGE_HANGUP}${FAILURE_FOOTER}
 			;;
 		-3)
+			SUBJECT=${FAILURE_SUBJECT}
+			MESSAGE=${FAILURE_HEADER}${FAILURE_MESSAGE_NOANSWER}${FAILURE_FOOTER}
 			;;
 		-5)
+			SUBJECT=${FAILURE_SUBJECT}
+			MESSAGE=${FAILURE_HEADER}${FAILURE_MESSAGE_BUSY}${FAILURE_FOOTER}
 			;;
 		-8)
+			SUBJECT=${FAILURE_SUBJECT}
+			MESSAGE=${FAILURE_HEADER}${FAILURE_MESSAGE_CONGESTION}${FAILURE_FOOTER}
 			;;
+		*)
+			SUBJECT=${FAILURE_SUBJECT}
+			MESSAGE=${FAILURE_HEADER}${FAILURE_MESSAGE_UNKNOWN}${FAILURE_FOOTER}
+			;;
+	esac
+
+	send "${ROOT}.tif" "${SENDER}"
+	[ ${CLEANUP} -ne 0 ] && run "cleanup spool files" 'rm -f "${ROOT}.tif" "${ROOT}.sff" "${ROOT}.sender"'
 fi
-exit 0
+
+finish

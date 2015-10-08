@@ -10,21 +10,30 @@ FROMSTRING="PBX"
 
 ROOT=/var/spool/asterisk/fax/${MESSAGE_ID}
 LOG=/var/log/asterisk/fax_log
-
-do () {
-	echo -n "$(date +'%F %T') ${MESSAGE_ID}: $1: " >> ${LOG}
-	(eval $2) > /dev/null 2>> ${LOG}
-	ERROR=$?
-	echo "[${ERROR}]" >> ${LOG}
-	if [ ${ERROR} -ne 0 ]; then
-		echo "An internal error occured. ($1)" 2>&1
-		exit ${ERROR}
-	fi
-}
+TEMP=$(mktemp -d) || exit $?
 
 die () {
-    echo "$1" 2>&1
-    exit 1
+	echo "$1" 2>&1
+	rm -rf "${TEMP}" 2> /dev/null
+	exit 1
 }
 
-[ "${MESSAGE_ID}" -ne "" ] || die "ERROR: MESSAGE_ID must be set"
+finish () {
+	rm -rf "${TEMP}" 2> /dev/null
+	exit 0
+}
+
+run () {
+	echo -n "$(date +'%F %T') ${MESSAGE_ID}: $1: " >> ${LOG}
+	eval $2 > /dev/null 2>> ${LOG}
+	[ $? -eq 0 ] || die "An internal error occured. ($1)"
+	echo "OK" >> ${LOG}
+}
+
+send () {
+	run "store mail text"  'echo "${MESSAGE}" > "${TEMP}/send.txt"'
+	run "create mime file" 'mpack -s "${SUBJECT}" -d "${TEMP}/send.txt" -c image/tiff -o "${TEMP}/send.mime" "'"$1"'"'
+	run "send mail to $2"  'sendmail -i -f "${SERVERMAIL}" -F "${FROMSTRING}" "'"$2"'" < "${TEMP}/send.mime"'
+}
+
+[ -n "${MESSAGE_ID}" ] || die "ERROR: MESSAGE_ID must be set"
