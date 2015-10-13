@@ -31,6 +31,8 @@
             this.components = new System.ComponentModel.Container();
             this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.notifyContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.restartStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.notifyToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.timeLabel = new System.Windows.Forms.Label();
             this.workTimer = new System.Windows.Forms.Timer(this.components);
@@ -40,8 +42,6 @@
             this.modifyMaskedTextBox = new System.Windows.Forms.MaskedTextBox();
             this.modifyButton = new System.Windows.Forms.Button();
             this.stateLabel = new System.Windows.Forms.Label();
-            this.notifyToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
-            this.restartStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyContextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.stateDataGridView)).BeginInit();
             this.SuspendLayout();
@@ -51,6 +51,7 @@
             this.NotifyIcon.ContextMenuStrip = this.notifyContextMenuStrip;
             this.NotifyIcon.Text = "BLF";
             this.NotifyIcon.Visible = true;
+            this.NotifyIcon.BalloonTipClicked += new System.EventHandler(this.NotifyIcon_DoubleClick);
             this.NotifyIcon.Click += new System.EventHandler(this.NotifyIcon_Click);
             this.NotifyIcon.DoubleClick += new System.EventHandler(this.NotifyIcon_DoubleClick);
             // 
@@ -62,12 +63,24 @@
             this.exitToolStripMenuItem});
             this.notifyContextMenuStrip.Name = "notifyContextMenuStrip";
             this.notifyContextMenuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.notifyContextMenuStrip.Size = new System.Drawing.Size(153, 76);
+            this.notifyContextMenuStrip.Size = new System.Drawing.Size(111, 54);
+            // 
+            // restartStripMenuItem
+            // 
+            this.restartStripMenuItem.Name = "restartStripMenuItem";
+            this.restartStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.restartStripMenuItem.Text = "Restart";
+            this.restartStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.restartStripMenuItem_DropDownItemClicked);
+            // 
+            // notifyToolStripSeparator
+            // 
+            this.notifyToolStripSeparator.Name = "notifyToolStripSeparator";
+            this.notifyToolStripSeparator.Size = new System.Drawing.Size(107, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -140,18 +153,6 @@
             this.stateLabel.Size = new System.Drawing.Size(77, 13);
             this.stateLabel.TabIndex = 5;
             this.stateLabel.Text = "Device States:";
-            // 
-            // notifyToolStripSeparator
-            // 
-            this.notifyToolStripSeparator.Name = "notifyToolStripSeparator";
-            this.notifyToolStripSeparator.Size = new System.Drawing.Size(149, 6);
-            // 
-            // restartStripMenuItem
-            // 
-            this.restartStripMenuItem.Name = "restartStripMenuItem";
-            this.restartStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.restartStripMenuItem.Text = "Restart";
-            this.restartStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.restartStripMenuItem_DropDownItemClicked);
             // 
             // MainForm
             // 
