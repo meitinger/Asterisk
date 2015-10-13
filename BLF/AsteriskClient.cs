@@ -50,8 +50,8 @@ namespace Aufbauwerk.Net.Asterisk
         private class AsyncResult : IAsyncResult
         {
             private readonly object syncRoot = new object();
-            private readonly ManualResetEvent waitHandle;
             private readonly WebClient webClient;
+            private readonly ManualResetEvent waitHandle;
             private bool cancelled;
             private Exception error;
             private string result;
@@ -66,8 +66,8 @@ namespace Aufbauwerk.Net.Asterisk
                 Address = new Uri(client.BaseUri, action.ToString());
                 Callback = callback;
                 AsyncState = state;
-                waitHandle = new ManualResetEvent(false);
                 webClient = new CookieWebClient(client.Cookies);
+                waitHandle = new ManualResetEvent(false);
                 try { ThreadPool.QueueUserWorkItem(BeginDownload); }
                 catch
                 {
@@ -79,17 +79,7 @@ namespace Aufbauwerk.Net.Asterisk
 
             public object AsyncState { get; private set; }
 
-            public WaitHandle AsyncWaitHandle
-            {
-                get
-                {
-                    // only return a handle if the op is async and running
-                    var handle = waitHandle;
-                    if (handle == null)
-                        throw new InvalidOperationException();
-                    return handle;
-                }
-            }
+            public WaitHandle AsyncWaitHandle { get { return waitHandle; } }
 
             public bool CompletedSynchronously { get; private set; }
 
