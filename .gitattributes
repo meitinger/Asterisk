@@ -1,3 +1,4 @@
 * text eol=lf
 *.tar.gz binary
 *.t4 binary
+*.ico binary

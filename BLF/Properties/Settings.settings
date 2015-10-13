@@ -1,0 +1,48 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BLF.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Username" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Secret" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="HoursPerWeek" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="StartDate" Type="System.DateTime" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Extension" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ExtensionsContext" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ExtensionsPattern" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="PrefixVariable" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RegistryKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RegistryValue" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RetryNetwork" Type="System.TimeSpan" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RetryManager" Type="System.TimeSpan" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Servers" Type="System.Collections.Specialized.StringCollection" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="NotifyTimeout" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>
