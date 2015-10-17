@@ -167,6 +167,11 @@ namespace BLF
         private IAsyncResult setDeviceState = null;
         private Timer start = null;
 
+        private void ReportException(IAsyncResult asyncResult, Exception e, bool isSevere)
+        {
+            Program.ShowMessage(BaseUri.ToString() + " - " + AsteriskAction.FromIAsyncResult(asyncResult).Name, e.Message, isSevere ? MessageType.Error : MessageType.Warning);
+        }
+
         private void SafeCancelExecute(ref IAsyncResult asyncResult)
         {
             // cancel and reset an existing async operation
@@ -197,7 +202,7 @@ namespace BLF
             {
                 // stop, show a warning and start again later
                 Stop();
-                Program.ShowMessage(BaseUri.ToString(), e.Message, MessageType.Warning);
+                ReportException(completedAsyncResult, e, false);
                 StartAsync(Settings.Default.RetryNetwork);
                 return false;
             }
@@ -205,7 +210,7 @@ namespace BLF
             {
                 // stop, show an error and start again later
                 Stop();
-                Program.ShowMessage(BaseUri.ToString(), e.Message, MessageType.Error);
+                ReportException(completedAsyncResult, e, true);
                 StartAsync(Settings.Default.RetryManager);
                 return false;
             }
