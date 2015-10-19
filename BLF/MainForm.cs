@@ -92,6 +92,7 @@ namespace BLF
 
         private readonly ExtensionSyncClient[] clients;
         private readonly Extension workExtension;
+        private DateTime lastTick = DateTime.Now;
 
         public MainForm()
         {
@@ -135,12 +136,15 @@ namespace BLF
 
         private void workTimer_Tick(object sender, EventArgs e)
         {
+            var now = DateTime.Now;
+            var duration = now - lastTick;
+            lastTick = now;
             var buffer = IntPtr.Zero;
             var size = 0;
             if (!WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, WTS_CURRENT_SESSION, WTS_INFO_CLASS.WTSConnectState, out buffer, out size))
                 throw new Win32Exception();
             if ((WTS_CONNECTSTATE_CLASS)Marshal.ReadInt32(buffer) == WTS_CONNECTSTATE_CLASS.WTSActive)
-                ModifyWork(TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond * workTimer.Interval));
+                ModifyWork(duration);
         }
 
         private void modifyButton_Click(object sender, EventArgs e)
