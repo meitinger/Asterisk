@@ -386,7 +386,7 @@ namespace BLF
         {
             Program.Synced(() =>
             {
-                if (!SafeEndExecute(ref showDialPlan, asyncResult, ar => EndExecuteEnumeration(ar).Where(e => string.Equals(e["Priority"], "hint", StringComparison.OrdinalIgnoreCase)).Select(e => e["Extension"]).Where(e => Regex.IsMatch(e, Settings.Default.ExtensionsPattern)).ToArray(), out dialPlan))
+                if (!SafeEndExecute(ref showDialPlan, asyncResult, ar => EndExecuteEnumeration(ar).Where(e => e.GetValues("Extension") != null && string.Equals(e["Priority"], "hint", StringComparison.OrdinalIgnoreCase)).Select(e => e["Extension"]).Where(e => Regex.IsMatch(e, Settings.Default.ExtensionsPattern)).ToArray(), out dialPlan))
                     return;
 
                 // set the extensions
