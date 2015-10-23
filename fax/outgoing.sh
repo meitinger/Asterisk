@@ -86,7 +86,7 @@ if [ $# -eq 0 ]; then
 	run "save mail to file"   'cat - > "${TEMP}/mime"'
 	run "create unpack dir"   'mkdir "${TEMP}/unpack/"'
 	run "extract attachments" 'munpack -f -q -C "${TEMP}/unpack/" "${TEMP}/mime"'
-	run "find tif files"      'TIFS=$(find "${TEMP}/unpack/" -wholename "*.tif?" -type f)'
+	run "find tif files"      'TIFS=$(find "${TEMP}/unpack/" -wholename "*.tif" -type f)'
 	[ -n "${TIFS}" ] || die "The e-mail doesn't contain any tifs."
 	run "count tif files"     'TIFS_COUNT=$(echo "${TIFS}" | wc -l)'
 	[ ${TIFS_COUNT} -eq 1 ] || die "The e-mail contains more than one tif."
