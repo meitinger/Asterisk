@@ -105,7 +105,7 @@ namespace BLF
             // create the clients and their restart buttons
             clients = Settings.Default.Servers.Cast<string>().Select(s => new ExtensionSyncClient(new Uri(s))).ToArray();
             foreach (var client in clients)
-                restartStripMenuItem.DropDownItems.Add(client.BaseUri.ToString()).Tag = client;
+                restartToolStripMenuItem.DropDownItems.Add(client.BaseUri.ToString()).Tag = client;
 
             // set the grid datasource and create the work extension
             stateDataGridView.DataSource = Extension.All;
@@ -121,7 +121,7 @@ namespace BLF
 
             // show the remaining time and set the extension
             var remaining = TimeSpan.FromHours((((int)(DateTime.Now - Settings.Default.StartDate).TotalDays / 7) + 1) * Settings.Default.HoursPerWeek) - work;
-            workExtension.State = remaining > TimeSpan.Zero ? ExtensionStates.NotInUse : ExtensionStates.Busy;
+            workExtension.State = compTimeToolStripMenuItem.Checked ? ExtensionStates.Ringing : remaining > TimeSpan.Zero ? ExtensionStates.NotInUse : ExtensionStates.Busy;
             NotifyIcon.Text = timeTextBox.Text = remaining.ToString();
         }
 
@@ -188,12 +188,18 @@ namespace BLF
                 NotifyIcon.ShowBalloonTip(Settings.Default.NotifyTimeout);
         }
 
-        private void restartStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private void restartToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             // restart the client
             var client = (ExtensionSyncClient)e.ClickedItem.Tag;
             client.Stop();
             client.Start();
+        }
+
+        private void compTimeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // toggle comp time
+            compTimeToolStripMenuItem.Checked = !compTimeToolStripMenuItem.Checked;
         }
     }
 }

@@ -169,7 +169,7 @@ namespace BLF
 
         private void ReportException(IAsyncResult asyncResult, Exception e, bool isSevere)
         {
-            Program.ShowMessage(BaseUri.ToString() + " - " + AsteriskAction.FromIAsyncResult(asyncResult).Name, e.Message, isSevere ? MessageType.Error : MessageType.Warning);
+            Program.ShowMessage(BaseUri.ToString() + " - " + AsteriskAction.FromIAsyncResult(asyncResult).Name, DateTime.Now.ToString("g") + ": " + e.Message, isSevere ? MessageType.Error : MessageType.Warning);
         }
 
         private void SafeCancelExecute(ref IAsyncResult asyncResult)

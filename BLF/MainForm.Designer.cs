@@ -31,7 +31,8 @@
             this.components = new System.ComponentModel.Container();
             this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.notifyContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.restartStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.compTimeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.timeLabel = new System.Windows.Forms.Label();
@@ -58,29 +59,37 @@
             // notifyContextMenuStrip
             // 
             this.notifyContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.restartStripMenuItem,
+            this.compTimeToolStripMenuItem,
+            this.restartToolStripMenuItem,
             this.notifyToolStripSeparator,
             this.exitToolStripMenuItem});
             this.notifyContextMenuStrip.Name = "notifyContextMenuStrip";
             this.notifyContextMenuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.notifyContextMenuStrip.Size = new System.Drawing.Size(111, 54);
+            this.notifyContextMenuStrip.Size = new System.Drawing.Size(127, 76);
             // 
-            // restartStripMenuItem
+            // compTimeToolStripMenuItem
             // 
-            this.restartStripMenuItem.Name = "restartStripMenuItem";
-            this.restartStripMenuItem.Size = new System.Drawing.Size(110, 22);
-            this.restartStripMenuItem.Text = "Restart";
-            this.restartStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.restartStripMenuItem_DropDownItemClicked);
+            this.compTimeToolStripMenuItem.Name = "compTimeToolStripMenuItem";
+            this.compTimeToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.compTimeToolStripMenuItem.Text = "Comp Time";
+            this.compTimeToolStripMenuItem.Click += new System.EventHandler(this.compTimeToolStripMenuItem_Click);
+            // 
+            // restartToolStripMenuItem
+            // 
+            this.restartToolStripMenuItem.Name = "restartToolStripMenuItem";
+            this.restartToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.restartToolStripMenuItem.Text = "Restart";
+            this.restartToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.restartToolStripMenuItem_DropDownItemClicked);
             // 
             // notifyToolStripSeparator
             // 
             this.notifyToolStripSeparator.Name = "notifyToolStripSeparator";
-            this.notifyToolStripSeparator.Size = new System.Drawing.Size(107, 6);
+            this.notifyToolStripSeparator.Size = new System.Drawing.Size(123, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -195,8 +204,9 @@
         private System.Windows.Forms.ContextMenuStrip notifyContextMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         internal System.Windows.Forms.NotifyIcon NotifyIcon;
-        private System.Windows.Forms.ToolStripMenuItem restartStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem restartToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator notifyToolStripSeparator;
+        private System.Windows.Forms.ToolStripMenuItem compTimeToolStripMenuItem;
     }
 }
 
