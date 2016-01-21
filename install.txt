@@ -10,7 +10,8 @@ cd asterisk-1.8.* &&
 make menuselect &&
 make &&
 sudo make install &&
-sudo make install-logrotate && 
+sudo make install-logrotate &&
+sudo sed 's/create 640 root root/create/' -i /etc/logrotate.d/asterisk &&
 sudo make config &&
 cd .. &&
 sudo tar --directory=/ -xf ./audio.tar.gz &&
@@ -49,6 +50,7 @@ sudo install fax/outgoing.sh /var/spool/asterisk/fax/ &&
 sudo install fax/incoming.sh /var/spool/asterisk/fax/ &&
 sudo cp fax/common.sh /var/spool/asterisk/fax/ &&
 sudo touch /var/log/asterisk/fax_log &&
+sudo chmod 0640 /var/log/asterisk/fax_log &&
 sudo chown Debian-exim:adm /var/log/asterisk/fax_log &&
 sudo cp fax/extensions_fax.conf /etc/asterisk/ &&
 sudo cp fax/modules_fax.conf /etc/asterisk/ &&
