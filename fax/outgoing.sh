@@ -1,10 +1,16 @@
 #!/bin/sh
-# Copyright (C) 2007-2015, Manuel Meitinger
+# Copyright (C) 2007-2016, Manuel Meitinger
 # This program is free software, distributed under the terms of
 # the GNU General Public License Version 2. See the LICENSE file
 # at the top of the source tree.
 
-CHANNEL="CAPI/g0/53:${LOCAL_PART}/Bo"
+case "${LOCAL_PART}" in
+	+43*) DIAL_NUMBER="0${LOCAL_PART##+43}" ;;
+	+*) DIAL_NUMBER="00${LOCAL_PART##+}" ;;
+	*) DIAL_NUMBER="${LOCAL_PART}" ;;
+esac
+
+CHANNEL="CAPI/g0/53:${DIAL_NUMBER}/Bo"
 CALLERID='"AufBauWerk" <+4351258581453>'
 TIMEOUT=600
 WAITTIME=30
