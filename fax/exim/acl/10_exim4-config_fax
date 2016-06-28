@@ -9,6 +9,6 @@ fax_check_rcpt:
     domains = ! +relay_to_domains
     message = Sorry, only faxing is allowed.
   deny
-    local_parts = ! \N^0\d+$\N
+    local_parts = ! \N^\+\d+$\N
     message = Sorry, the provided fax number is invalid.
   accept
