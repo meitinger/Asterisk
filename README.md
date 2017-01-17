@@ -36,7 +36,7 @@ following:
    digit, you have to adjust `BRANCHES_LEN` and maybe others like `PADDING`
    as well.
 2. You have to provide at least `extensions_local.conf`, `manager_local.conf`,
-   `modules_local.conf` and `users_local.conf` by our own and place then into
+   `modules_local.conf` and `users_local.conf` by our own and place them into
    the `config` directory.
 3. `extensions_local.conf`:
    1. The variable `BRANCH` must be defined in a `[globals](+)` section.
