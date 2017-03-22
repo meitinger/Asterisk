@@ -22,8 +22,6 @@ sudo chown -R $(whoami):root /etc/asterisk/
 
 # Exim
 sudo apt-get install exim4 &&
-sudo cp ./exim/00_exim4-config_aufbauwerk /etc/exim4/conf.d/main/ &&
-sudo cp ./exim/01_exim4-config_aufbauwerk /etc/exim4/conf.d/rewrite/ &&
 sudo dpkg-reconfigure exim4-config
 
 # ISDN

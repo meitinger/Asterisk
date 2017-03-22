@@ -18,7 +18,6 @@ Files
 
 Folders
 -------
-* `exim`: rewrite instructions to always send emails to the proper admin
 * `fax`: shell scripts and dialplan extensions to send and receive faxes
 * `isdn`: files necessary to setup an AVM B1 card with Asterisk 1.8
 * `config`: all public configuration files including the dialplan
