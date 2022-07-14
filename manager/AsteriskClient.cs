@@ -226,7 +226,7 @@ namespace Aufbauwerk.Asterisk
         /// <exception cref="HttpRequestException">An error or timeout occurred while querying the server.</exception>
         /// <exception cref="AsteriskException">The server response contains an error.</exception>
         /// <exception cref="ObjectDisposedException">The current instance has been disposed.</exception>
-        /// /// <exception cref="OperationCanceledException">The operation has been canceled.</exception>
+        /// <exception cref="OperationCanceledException">The operation has been canceled.</exception>
         public Task<AsteriskEnumeration> ExecuteEnumerationAsync(AsteriskAction action, CancellationToken cancellationToken) => ExecuteAsync(action, (action, s) => new AsteriskEnumeration(s, action.Name + "Complete"), cancellationToken);
 
         /// <summary>

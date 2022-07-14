@@ -67,7 +67,6 @@ namespace Aufbauwerk.Asterisk.Blf
                 update = await client.WaitAndKeepAliveAsync(DeviceStates.GetChanged(update, states, cancellationToken));
 
                 // update the state on Asterisk and the local cache
-                LogEvent(System.Diagnostics.EventLogEntryType.Information, $"Update {update.Device} to {update.State}");
                 await client.ExecuteNonQueryAsync(new("Setvar")
                 {
                     { "Variable", string.Format("DEVICE_STATE({0})", update.Device) },

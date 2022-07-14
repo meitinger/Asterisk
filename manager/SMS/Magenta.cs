@@ -155,7 +155,7 @@ namespace Aufbauwerk.Asterisk.Sms
         public string Language { get; set; } = "en";
 
         [JsonProperty(PropertyName = "encoding")]
-        public SmsEncoding Encoding { get; set; } = SmsEncoding.DEFAULT;
+        public SmsEncoding Encoding { get; set; } = SmsEncoding.STANDARD;
     }
 
     internal record SendSmsResponse : IJsonResponse
@@ -178,7 +178,7 @@ namespace Aufbauwerk.Asterisk.Sms
     [JsonConverter(typeof(StringEnumConverter))]
     internal enum SmsEncoding
     {
-        DEFAULT,
+        STANDARD,
         UNICODE,
     }
 

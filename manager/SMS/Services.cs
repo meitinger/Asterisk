@@ -28,7 +28,7 @@ namespace Aufbauwerk.Asterisk.Sms
 {
     internal class MissedCallsService : AstersikService
     {
-        private static readonly Regex MissedCallRegex = new(@"(?<shortcode>\d+)|(?<caller>\+\d+)|(?<time>\d+)", RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
+        private static readonly Regex MissedCallRegex = new(@"^(?<shortcode>\d+)\|(?<caller>\+\d+)\|(?<time>\d+)$", RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
         private static async Task<long> GetNumberAsync(AsteriskClient client, string key, CancellationToken cancellationToken) => long.TryParse(await GetValueAsync(client, key, cancellationToken), out var value) ? value : throw new AsteriskException($"Key '{key}' does not contain a numeric value.");
 
@@ -68,7 +68,7 @@ namespace Aufbauwerk.Asterisk.Sms
                     {
                         var shortcode = missedCall.Groups["shortcode"].Value;
                         var caller = missedCall.Groups["caller"].Value;
-                        var time = new DateTime(621355968000000000 + unixTime, DateTimeKind.Utc).ToLocalTime();
+                        var time = new DateTime(621355968000000000 + unixTime * TimeSpan.TicksPerSecond, DateTimeKind.Utc).ToLocalTime();
 
                         // try to send the missed call notification with multiple attempts
                         for (int attempt = 0; attempt <= Settings.Instance.Sms.Retries; attempt++)
@@ -173,7 +173,7 @@ namespace Aufbauwerk.Asterisk.Sms
             _suggestionItems.Clear();
             foreach (var item in uiData.SuggestionItems.Where(item => item.Type == SuggestionItemType.SHORTCODE))
             {
-                if (_suggestionItems.TryGetValue(item.SearchTerm, out var existingItem)) LogEvent(EventLogEntryType.Warning, $"Ignore duplicate short-code '{item.SearchTerm}', old value '{existingItem.DisplayName}', new value '{item.DisplayName}'.");
+                if (_suggestionItems.TryGetValue(item.SearchTerm, out var existingItem)) LogEvent(EventLogEntryType.Warning, $"Duplicate short-code '{item.SearchTerm}', kept '{existingItem.DisplayName}' and ignored '{item.DisplayName}'.");
                 else _suggestionItems.Add(item.SearchTerm, item);
             }
             LogEvent(EventLogEntryType.Information, $"Retrieved {_suggestionItems.Count} phone numbers and sender name '{uiData.SenderName}'.");
@@ -196,8 +196,9 @@ namespace Aufbauwerk.Asterisk.Sms
                 }
                 catch (HttpRequestException e)
                 {
-                    // log the error, wait and retry
-                    LogEvent(EventLogEntryType.Warning, e.ToString());
+                    CheckCancellationAndLogException(e);
+
+                    // wait for a bit and retry login
                     await Task.Delay(Settings.Instance.Sms.LoginRetryInterval, cancellationToken);
                     continue;
                 }
@@ -212,15 +213,19 @@ namespace Aufbauwerk.Asterisk.Sms
 
                     // release the lock to allow sending
                     _lock.Release();
+                    try
+                    {
+                        // either wait for 9/10th of the expiration time or until a sender encounters a 401
+                        try { await Task.Delay(token.ExpiresIn.HasValue ? (token.ExpiresIn.Value * 900) : Timeout.Infinite, _waitAccessTokenRefreshCts.Token); }
+                        catch (OperationCanceledException) when (_waitAccessTokenRefreshCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested) { }
+                    }
+                    finally
+                    {
+                        // re-acquire the lock to prevent sending, not allowing cancellation
+                        await _lock.WaitAsync();
+                    }
 
-                    // either wait for 9/10 of the expiration time or until a sender encounters a 401
-                    try { await Task.Delay(token.ExpiresIn.HasValue ? (token.ExpiresIn.Value * 900) : Timeout.Infinite, _waitAccessTokenRefreshCts.Token); }
-                    catch (OperationCanceledException) when (_waitAccessTokenRefreshCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested) { }
-
-                    // re-acquire the lock to prevent sending
-                    await _lock.WaitAsync(cancellationToken);
-
-                    // break the loop and re-login if there is no refresh token
+                    // if there is no refresh token then break the loop and re-login
                     if (token.RefreshTokenValue is null) { break; }
 
                     // refresh the access token and phone directory
@@ -231,11 +236,19 @@ namespace Aufbauwerk.Asterisk.Sms
                     }
                     catch (HttpRequestException e)
                     {
+                        CheckCancellationAndLogException(e);
+
                         // break the refresh loop and re-login
-                        LogEvent(EventLogEntryType.Warning, e.ToString());
                         break;
                     }
                 }
+            }
+
+            void CheckCancellationAndLogException(HttpRequestException e)
+            {
+                // .NET 4 throws HttpRequestException on cancellation, so check for that
+                cancellationToken.ThrowIfCancellationRequested();
+                LogEvent(EventLogEntryType.Warning, e.ToString());
             }
         }
     }
