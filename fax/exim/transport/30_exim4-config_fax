@@ -1,7 +1,7 @@
 spool_fax:
   debug_print = "T: spool_fax for $local_part@$domain"
   driver = pipe
-  command = /var/spool/asterisk/fax/outgoing.sh
+  command = /usr/bin/super fax send
   use_shell = true
   log_fail_output = true
   return_fail_output = true
