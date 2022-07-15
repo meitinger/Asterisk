@@ -111,8 +111,7 @@ namespace Aufbauwerk.Asterisk.Sms
             // retrieve the code from the redirect URI
             if (!IsRedirectedTo(RedirectUri)) throw new HttpRequestException($"TGate redirected to unknown URI '{redirectUri}'.");
             var code = System.Web.HttpUtility.ParseQueryString(redirectUri.Query)["code"];
-            if (string.IsNullOrEmpty(code)) throw new HttpRequestException($"TGate didn't include OAuth code in the redirect URI '{redirectUri}'.");
-            return code;
+            return string.IsNullOrEmpty(code) ? throw new HttpRequestException($"TGate didn't include OAuth code in the redirect URI '{redirectUri}'.") : code;
 
             bool IsRedirectedTo(string path) => redirectUri.GetComponents(UriComponents.Scheme | UriComponents.Host | UriComponents.Port | UriComponents.Path, UriFormat.UriEscaped) == path;
         }

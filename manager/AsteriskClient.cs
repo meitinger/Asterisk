@@ -262,11 +262,7 @@ namespace Aufbauwerk.Asterisk
         /// <exception cref="AsteriskException">The server response contains an error.</exception>
         /// <exception cref="ObjectDisposedException">The current instance has been disposed.</exception>
         /// <exception cref="OperationCanceledException">The operation has been canceled.</exception>
-        public Task<string> ExecuteScalarAsync(AsteriskAction action, string valueName, CancellationToken cancellationToken)
-        {
-            if (valueName.Length == 0) throw ExceptionBuilder.EmptyArgument(nameof(valueName));
-            return ExecuteAsync(action, (action, s) => new AsteriskResponse(s, action.ExpectedResponse).Get(valueName), cancellationToken);
-        }
+        public Task<string> ExecuteScalarAsync(AsteriskAction action, string valueName, CancellationToken cancellationToken) => valueName.Length == 0 ? throw ExceptionBuilder.EmptyArgument(nameof(valueName)) : ExecuteAsync(action, (action, s) => new AsteriskResponse(s, action.ExpectedResponse).Get(valueName), cancellationToken);
 
         private async Task KeepAliveAsync(CancellationToken cancellationToken)
         {
@@ -595,9 +591,10 @@ namespace Aufbauwerk.Asterisk
         {
             // ensure that there is one and only one value
             var values = GetValues(name);
-            if (values is null || values.Length == 0) throw ExceptionBuilder.ResultSetKeyNotFound(name);
-            if (values.Length > 1) throw ExceptionBuilder.ResultSetKeyNotUnique(name);
-            return values[0];
+            return
+                values is null || values.Length == 0 ? throw ExceptionBuilder.ResultSetKeyNotFound(name) :
+                values.Length > 1 ? throw ExceptionBuilder.ResultSetKeyNotUnique(name) :
+                values[0];
         }
     }
 

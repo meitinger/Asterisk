@@ -66,14 +66,13 @@ namespace Aufbauwerk.Asterisk
             if (!e.Observed) Exit(e.Exception, -2147483640 /* E_FAIL */);
         }
 
-        internal static void LogEvent(EventLogEntryType type, string message)
-        {
+        internal static void LogEvent(EventLogEntryType type, string message) =>
 #if DEBUG
             Console.WriteLine($"[{type}] {message}");
 #else
             _instance.EventLog.WriteEntry(message, type);
 #endif
-        }
+
 
         public static void Main(string[] args)
         {
