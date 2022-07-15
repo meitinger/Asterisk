@@ -149,13 +149,13 @@ namespace Aufbauwerk.Asterisk.Sms
         public string Content { get; set; }
 
         [JsonProperty(PropertyName = "custCode")]
-        public string CustomerCode { get; set; } = Settings.Instance.Sms.CustomerCode;
+        public string CustomerCode => Settings.Instance.Sms.CustomerCode;
 
         [JsonProperty(PropertyName = "lang")]
-        public string Language { get; set; } = "en";
+        public string Language => Settings.Instance.Sms.Culture.TwoLetterISOLanguageName;
 
         [JsonProperty(PropertyName = "encoding")]
-        public SmsEncoding Encoding { get; set; } = SmsEncoding.STANDARD;
+        public string Encoding => "STANDARD";
     }
 
     internal record SendSmsResponse : IJsonResponse
@@ -173,13 +173,6 @@ namespace Aufbauwerk.Asterisk.Sms
 
         [JsonProperty(PropertyName = "senderPhoneNumber", Required = Required.Always)]
         public string SenderName { get; }
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    internal enum SmsEncoding
-    {
-        STANDARD,
-        UNICODE,
     }
 
     internal record SuggestionItem

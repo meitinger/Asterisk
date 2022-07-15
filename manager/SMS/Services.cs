@@ -28,7 +28,7 @@ namespace Aufbauwerk.Asterisk.Sms
 {
     internal class MissedCallsService : AstersikService
     {
-        private static readonly Regex MissedCallRegex = new(@"^(?<shortcode>\d+)\|(?<caller>\+\d+)\|(?<time>\d+)$", RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
+        private static readonly Regex MissedCallRegex = new(@"^(?<shortcode>\d+)\|(?<caller>(\+\d+)?)\|(?<time>\d+)$", RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
         private static async Task<long> GetNumberAsync(AsteriskClient client, string key, CancellationToken cancellationToken) => long.TryParse(await GetValueAsync(client, key, cancellationToken), out var value) ? value : throw new AsteriskException($"Key '{key}' does not contain a numeric value.");
 
@@ -68,10 +68,11 @@ namespace Aufbauwerk.Asterisk.Sms
                     {
                         var shortcode = missedCall.Groups["shortcode"].Value;
                         var caller = missedCall.Groups["caller"].Value;
+                        if (caller.Length == 0) caller = Settings.Instance.Sms.UnknownCaller;
                         var time = new DateTime(621355968000000000 + unixTime * TimeSpan.TicksPerSecond, DateTimeKind.Utc).ToLocalTime();
 
-                        // try to send the missed call notification with multiple attempts
-                        for (int attempt = 0; attempt <= Settings.Instance.Sms.Retries; attempt++)
+                        // try to send the missed call notification, retry on network or authentication failures
+                        while (true)
                         {
                             cancellationToken.ThrowIfCancellationRequested();
 
@@ -87,7 +88,7 @@ namespace Aufbauwerk.Asterisk.Sms
 
                             // get a hold of the instance and send the text
                             using var instance = await client.WaitAndKeepAliveAsync(SendService.Instance.CreateAsync(cancellationToken));
-                            if (await instance.SendTextAsync(shortcode, string.Format(Settings.Instance.Sms.TextTemplate, caller, time), cancellationToken)) break;
+                            if (!instance.IsKnownShortcode(shortcode) || await instance.SendTextAsync(shortcode, string.Format(Settings.Instance.Sms.Culture, Settings.Instance.Sms.Text, caller, time), cancellationToken)) break;
                         }
                     }
                     else LogEvent(EventLogEntryType.Warning, $"Missed call #{first} has an invalid format.");
@@ -120,31 +121,9 @@ namespace Aufbauwerk.Asterisk.Sms
 
             private Instance() { }
 
-            public async Task<bool> SendTextAsync(string shortcode, string text, CancellationToken cancellationToken)
+            private void CheckDisposed()
             {
-                // lookup the recipient
                 if (_disposed) throw new ObjectDisposedException(GetType().FullName);
-                if (!_suggestionItems.TryGetValue(shortcode, out var suggestedItem))
-                {
-                    _instance.LogEvent(EventLogEntryType.Information, $"Short code '{shortcode}' not found.");
-                    return true;
-                }
-
-                // send the text
-                try
-                {
-                    using var response = await _client.PostAsync($"https://businessportal.magenta.at/services/messaging/sendSms?vpnId={Uri.EscapeDataString(Settings.Instance.Sms.VpnId)}", new SendSmsRequest(text, suggestedItem).Serialize(), cancellationToken);
-                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) _waitAccessTokenRefreshCts.Cancel();
-                    var responseContent = await response.EnsureSuccessStatusCode().Content.Deserialize<SendSmsResponse>();
-                    if (responseContent.NumberOfReceivers == 0) _instance.LogEvent(EventLogEntryType.Warning, $"Cannot send to recipient '{suggestedItem.DisplayName}'.");
-                    else _instance.LogEvent(EventLogEntryType.Information, $"Sent text to '{suggestedItem.DisplayName}' from '{responseContent.SenderName}'.");
-                    return true;
-                }
-                catch (HttpRequestException e)
-                {
-                    _instance.LogEvent(EventLogEntryType.Warning, $"Sending text to '{suggestedItem.DisplayName}' failed: {e}");
-                    return false;
-                }
             }
 
             public void Dispose()
@@ -154,6 +133,38 @@ namespace Aufbauwerk.Asterisk.Sms
                     _disposed = true;
                     _lock.Release();
                 }
+            }
+
+            public bool IsKnownShortcode(string shortcode)
+            {
+                CheckDisposed();
+                return _suggestionItems.ContainsKey(shortcode);
+            }
+
+            public async Task<bool> SendTextAsync(string shortcode, string text, CancellationToken cancellationToken)
+            {
+                // perform preliminary checks
+                CheckDisposed();
+                var suggestedItem = _suggestionItems[shortcode];
+
+                // try to send the text
+                var hasAuthorizedResponse = false;
+                try
+                {
+                    using var response = await _client.PostAsync($"https://businessportal.magenta.at/services/messaging/sendSms?vpnId={Uri.EscapeDataString(Settings.Instance.Sms.VpnId)}", new SendSmsRequest(text, suggestedItem).Serialize(), cancellationToken);
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) _waitAccessTokenRefreshCts.Cancel();
+                    else hasAuthorizedResponse = true;
+                    var responseContent = await response.EnsureSuccessStatusCode().Content.Deserialize<SendSmsResponse>();
+                    if (responseContent.NumberOfReceivers == 0) _instance.LogEvent(EventLogEntryType.Warning, $"Cannot send to recipient '{suggestedItem.DisplayName}'.");
+                    else _instance.LogEvent(EventLogEntryType.Information, $"Sent text to '{suggestedItem.DisplayName}' from '{responseContent.SenderName}'.");
+                }
+                catch (HttpRequestException e)
+                {
+                    // .NET 4 throws HttpRequestException on cancellation, so check for that
+                    cancellationToken.ThrowIfCancellationRequested();
+                    _instance.LogEvent(EventLogEntryType.Warning, $"Sending text to '{suggestedItem.DisplayName}' failed: {e}");
+                }
+                return hasAuthorizedResponse;
             }
         }
 

@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Globalization;
 
 namespace Aufbauwerk.Asterisk
 {
@@ -102,9 +103,10 @@ namespace Aufbauwerk.Asterisk
             private const string PasswordAttribute = "password";
             private const string VpnIdAttribute = "vpnId";
             private const string CustomerCodeAttribute = "customerCode";
-            private const string TextTemplateAttribute = "textTemplate";
+            private const string TextAttribute = "text";
+            private const string CultureAttribute = "culture";
+            private const string UnknownCallerAttribute = "unknownCaller";
             private const string MaximumAgeAttribute = "maximumAge";
-            private const string RetriesAttribute = "retries";
             private const string LoginRetryIntervalAttribute = "loginRetryInterval";
 
             [ConfigurationProperty(UsernameAttribute, IsRequired = true)]
@@ -119,16 +121,18 @@ namespace Aufbauwerk.Asterisk
             [ConfigurationProperty(CustomerCodeAttribute, IsRequired = true)]
             public string CustomerCode => (string)this[CustomerCodeAttribute];
 
-            [ConfigurationProperty(TextTemplateAttribute, IsRequired = true)]
-            public string TextTemplate => (string)this[TextTemplateAttribute];
+            [ConfigurationProperty(TextAttribute, IsRequired = true)]
+            public string Text => (string)this[TextAttribute];
+
+            [ConfigurationProperty(CultureAttribute, DefaultValue = "en-US")]
+            public CultureInfo Culture => (CultureInfo)this[CultureAttribute];
+
+            [ConfigurationProperty(UnknownCallerAttribute, IsRequired = true)]
+            public string UnknownCaller => (string)this[UnknownCallerAttribute];
 
             [ConfigurationProperty(MaximumAgeAttribute, DefaultValue = "24:00:00")]
             [PositiveTimeSpanValidator]
             public TimeSpan MaximumAge => (TimeSpan)this[MaximumAgeAttribute];
-
-            [ConfigurationProperty(RetriesAttribute, DefaultValue = 2)]
-            [IntegerValidator(MinValue = 0)]
-            public int Retries => (int)this[RetriesAttribute];
 
             [ConfigurationProperty(LoginRetryIntervalAttribute, DefaultValue = "00:15:00")]
             [PositiveTimeSpanValidator]
