@@ -81,7 +81,7 @@ namespace Aufbauwerk.Asterisk
             [ConfigurationProperty(DeviceFormatAttribute, DefaultValue = "Custom:$0")]
             public string DeviceFormat => (string)this[DeviceFormatAttribute];
 
-            public override string ToString() => $"{Host}:{Port}{(string.IsNullOrEmpty(Prefix) ? "" : "/")}{Prefix}";
+            public override string ToString() => Name;
         }
 
         public sealed class ServerCollection : ConfigurationElementCollection, IEnumerable<Server>

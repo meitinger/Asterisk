@@ -68,10 +68,10 @@ namespace Aufbauwerk.Asterisk.Sms
         }
 
         [JsonProperty(PropertyName = "code")]
-        public string Code { get; set; }
+        public string Code { get; }
 
         [JsonProperty(PropertyName = "redirect_uri")]
-        public string RedirectUri { get; set; }
+        public string RedirectUri { get; }
     }
 
     internal record AccessTokenRefreshRequest : IJsonRequest
@@ -81,7 +81,7 @@ namespace Aufbauwerk.Asterisk.Sms
         public AccessTokenRefreshRequest(string refreshToken) => RefreshToken = refreshToken;
 
         [JsonProperty(PropertyName = "refresh_token")]
-        public string RefreshToken { get; set; }
+        public string RefreshToken { get; }
     }
 
     internal static class BusinessPortal
@@ -143,10 +143,10 @@ namespace Aufbauwerk.Asterisk.Sms
         }
 
         [JsonProperty(PropertyName = "suggestionItems")]
-        public IList<SuggestionItem> Recipients { get; set; }
+        public IList<SuggestionItem> Recipients { get; }
 
         [JsonProperty(PropertyName = "content")]
-        public string Content { get; set; }
+        public string Content { get; }
 
         [JsonProperty(PropertyName = "custCode")]
         public string CustomerCode => Settings.Instance.Sms.CustomerCode;

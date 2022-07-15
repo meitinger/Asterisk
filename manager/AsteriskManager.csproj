@@ -5,7 +5,7 @@
     <TargetFramework>net472</TargetFramework>
     <LangVersion>10</LangVersion>
     <Nullable>enable</Nullable>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Company>AufBauWerk - Unternehmen für junge Menschen</Company>
     <Copyright>Copyright © 2015-2022 Manuel Meitinger</Copyright>
     <Description>Syncs extension states across multiple Asterisk servers and sends SMS messages on missed calls.</Description>
