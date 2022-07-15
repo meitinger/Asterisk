@@ -64,10 +64,7 @@ namespace Aufbauwerk.Asterisk
             // check, escape and add the parameter
             if (paramName.Length == 0) throw ExceptionBuilder.EmptyArgument(nameof(paramName));
             _parameters.Add(paramName, paramValue);
-            _queryBuilder.Append('&');
-            _queryBuilder.Append(Uri.EscapeUriString(paramName));
-            _queryBuilder.Append('=');
-            _queryBuilder.Append(Uri.EscapeUriString(paramValue));
+            _queryBuilder.Append('&').Append(Uri.EscapeUriString(paramName)).Append('=').Append(Uri.EscapeUriString(paramValue));
         }
 
         internal string ExpectedResponse => string.Equals(Name, "Logoff", StringComparison.OrdinalIgnoreCase) ? "Goodbye" : "Success";
