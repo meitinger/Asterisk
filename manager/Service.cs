@@ -87,7 +87,7 @@ namespace Aufbauwerk.Asterisk
                         // always try to logout, but ignore errors
                         try
                         {
-                            using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                            using CancellationTokenSource cancellationTokenSource = new();
                             cancellationTokenSource.CancelAfter(Server.ShutdownTimeLimit);
                             await client.ExecuteNonQueryAsync(new("Logoff"), cancellationTokenSource.Token);
                             LogEvent(EventLogEntryType.Information, "Logged off from AMI.");

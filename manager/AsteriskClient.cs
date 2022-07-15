@@ -391,7 +391,7 @@ namespace Aufbauwerk.Asterisk
 
             // get the rest
             _events = new AsteriskEvent[items.Length - 2];
-            for (int i = 0; i < _events.Length; i++) _events[i] = new(items[i + 1]);
+            for (var i = 0; i < _events.Length; i++) _events[i] = new(items[i + 1]);
         }
 
         /// <summary>
@@ -574,7 +574,7 @@ namespace Aufbauwerk.Asterisk
 
             // add each name-value pair
             var endOfSet = false;
-            for (int i = 0; i < lines.Length; i++)
+            for (var i = 0; i < lines.Length; i++)
             {
                 var line = lines[i];
                 if (line.Length == 0) endOfSet = true;
