@@ -69,7 +69,7 @@ namespace Aufbauwerk.Asterisk.Sms
                         var shortcode = missedCall.Groups["shortcode"].Value;
                         var caller = missedCall.Groups["caller"].Value;
                         if (caller.Length == 0) caller = Settings.Instance.Sms.UnknownCaller;
-                        var time = new DateTime(621355968000000000 + unixTime * TimeSpan.TicksPerSecond, DateTimeKind.Utc).ToLocalTime();
+                        var time = new DateTime(621355968000000000 + (unixTime * TimeSpan.TicksPerSecond), DateTimeKind.Utc).ToLocalTime();
 
                         // try to send the missed call notification, retry on network or authentication failures
                         while (true)
